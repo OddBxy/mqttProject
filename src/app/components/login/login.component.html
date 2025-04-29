@@ -1,0 +1,7 @@
+<div class="login-container">
+  <h2>Bienvenue sur le chat !</h2>
+  <div class="login-form" id="login-form">
+    <input type="text" id="pseudo-input" [(ngModel)]="currentUser.pseudo" placeholder="Choisissez un pseudo">
+    <button type="submit" (click)="logIn()">Se connecter</button>
+  </div>
+</div>

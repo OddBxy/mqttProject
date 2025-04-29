@@ -1,0 +1,55 @@
+
+<div class="chat-container" id="chat-container">
+  <!-- Barre latérale -->
+  <div class="sidebar">
+    <div class="user-info">
+      <div class="user-avatar" id="user-avatar">C</div>
+      <div class="user-name" id="user-name">{{currentUser.pseudo}}</div>
+      <button class="change-pseudo-btn" id="change-pseudo-btn">
+        <i class="fas fa-edit"></i> ✏️
+      </button>
+    </div>
+   <div class="channels-header">
+      <span>SALONS</span>
+      <button class="add-channel-btn" id="add-channel-btn">+</button>
+    </div>
+    <ul class="channels-list" id="channels-list">
+      <li class="active default-channel" data-channel="general">
+        <span class="channel-name">Général</span>
+        <span class="delete-channel">🗑️</span>
+      </li>
+      <li class="default-channel" data-channel="aide">
+        <span class="channel-name">Aide & Support</span>
+        <span class="delete-channel">🗑️</span>
+      </li>
+      <li class="default-channel" data-channel="blabla">
+        <span class="channel-name">Blabla</span>
+        <span class="delete-channel">🗑️</span>
+      </li>
+      <li class="default-channel" data-channel="tech">
+        <span class="channel-name">Technologie</span>
+        <span class="delete-channel">🗑️</span>
+      </li>
+    </ul>
+    <select class="salon-selector" id="salon-selector">
+      <option value="general">Général</option>
+      <option value="aide">Aide & Support</option>
+      <option value="blabla">Blabla</option>
+      <option value="tech">Technologie</option>
+    </select>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="main-content">
+    <div class="chat-header">
+      <div class="current-channel-name"># <span id="current-channel">général</span></div>
+    </div>
+    <div class="messages-container" id="messages-container">
+      <!-- Les messages seront ajoutés ici dynamiquement -->
+    </div>
+    <div class="message-input-container">
+      <textarea class="message-input" id="message-input" placeholder="Écrivez votre message..."></textarea>
+      <button class="send-button" id="send-button">Envoyer</button>
+    </div>
+  </div>
+</div>
