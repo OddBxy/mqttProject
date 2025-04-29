@@ -1,1 +1,370 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --primary-color: #4285f4;
+  --secondary-color: #34a853;
+  --background-color: #f5f5f5;
+  --sidebar-bg: #2c3e50;
+  --message-bg: #ffffff;
+  --my-message-bg: #dcf8c6;
+  --text-color: #333333;
+  --sidebar-text: #ecf0f1;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--background-color);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  padding: 30px;
+  margin: 100px auto;
+  text-align: center;
+}
+
+.login-container h2 {
+  margin-bottom: 20px;
+  color: var(--primary-color);
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.login-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.login-form button:hover {
+  background-color: #3367d6;
+}
+
+.chat-container {
+  display: none;
+  height: 100vh;
+  flex-direction: row;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.user-name {
+  font-size: 16px;
+  flex-grow: 1;
+}
+
+.change-pseudo-btn {
+  background: none;
+  border: none;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.change-pseudo-btn:hover {
+  opacity: 1;
+}
+
+.channels-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.add-channel-btn {
+  background: none;
+  border: none;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+.add-channel-btn:hover {
+  opacity: 1;
+}
+
+.channels-list {
+  list-style: none;
+  margin-bottom: 20px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.channels-list li {
+  padding: 8px 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.channels-list li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.channels-list li.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: bold;
+}
+
+.channel-name::before {
+  content: "#";
+  margin-right: 5px;
+  opacity: 0.7;
+}
+
+.delete-channel {
+  display: none;
+  color: var(--sidebar-text);
+  opacity: 0.5;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.channels-list li:hover .delete-channel {
+  display: inline;
+}
+
+.delete-channel:hover {
+  opacity: 1;
+  color: #ff4d4d;
+}
+
+.default-channel .delete-channel {
+  display: none !important;
+}
+
+.salon-selector {
+  width: 100%;
+  padding: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--sidebar-text);
+  border: none;
+  border-radius: 4px;
+  outline: none;
+  margin-top: 10px;
+}
+
+.salon-selector:focus {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.salon-selector option {
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+}
+
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  background-color: white;
+  padding: 15px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.current-channel-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.chat-header span {
+  color: #777;
+  font-size: 14px;
+  margin-left: 5px;
+}
+
+.messages-container {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.message {
+  max-width: 70%;
+  padding: 12px 15px;
+  border-radius: 10px;
+  background-color: var(--message-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  position: relative;
+  align-self: flex-start;
+}
+
+.message.my-message {
+  background-color: var(--my-message-bg);
+  align-self: flex-end;
+}
+
+.message-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.message-author {
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.message-time {
+  font-size: 12px;
+  color: #999;
+}
+
+.message-content {
+  word-wrap: break-word;
+}
+
+.message-input-container {
+  padding: 15px;
+  background-color: white;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+}
+
+.message-input {
+  flex-grow: 1;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+  resize: none;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.send-button {
+  margin-left: 10px;
+  padding: 12px 20px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.send-button:hover {
+  background-color: #3367d6;
+}
+
+/* Popup pour changer de pseudo */
+.popup-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.popup h3 {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.popup input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.popup-button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-button {
+  background-color: #f2f2f2;
+}
+
+.confirm-button {
+  background-color: var(--primary-color);
+  color: white;
+}
