@@ -23,11 +23,6 @@
         </div>
       </li>
     </ul>
-    <select class="salon-selector" [(ngModel)]="currentChannel" (change)="changeChannel(currentChannel)">
-      <option *ngFor="let channel of channelNames | keyvalue" [value]="channel.key">
-        {{ channel.value }}
-      </option>
-    </select>
   </div>
 
   <!-- Main Content -->
