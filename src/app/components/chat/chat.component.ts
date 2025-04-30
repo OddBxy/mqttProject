@@ -107,7 +107,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         author: this.currentUser.pseudo,
         content,
         time: new Date(),
-        isMyMessage: true
       };
 
       // Add to local array
@@ -128,7 +127,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       content,
       time: new Date(),
       isSystem,
-      isMyMessage
     };
 
     this.channelMessages[this.currentChannel].push(messageData);

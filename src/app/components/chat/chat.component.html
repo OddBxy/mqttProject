@@ -16,9 +16,11 @@
       <li *ngFor="let item of channelNames | keyvalue"
           [class.active]="currentChannel === item.key"
           [class.default-channel]="isDefaultChannel(item.key)">
-        <span class="channel-name" (click)="changeChannel(item.key)">{{ item.value }}</span>
-        <span class="delete-channel" *ngIf="!isDefaultChannel(item.key)"
-              (click)="deleteChannel(item.key)">🗑️</span>
+        <div class="channel-container" (click)="changeChannel(item.key)">
+          <span class="channel-name" (click)="changeChannel(item.key)">{{ item.value }}</span>
+          <span class="delete-channel" *ngIf="!isDefaultChannel(item.key)"
+                (click)="deleteChannel(item.key)">🗑️</span>
+        </div>
       </li>
     </ul>
     <select class="salon-selector" [(ngModel)]="currentChannel" (change)="changeChannel(currentChannel)">
@@ -36,7 +38,7 @@
     <div class="messages-container" #messagesContainer>
       <div *ngFor="let msg of channelMessages[currentChannel]"
            class="message"
-           [class.my-message]="msg.isMyMessage">
+           [class.my-message]="msg.author === currentUser.pseudo">
         <div class="message-header">
           <div class="message-author">{{ msg.author }}</div>
           <div class="message-time">
