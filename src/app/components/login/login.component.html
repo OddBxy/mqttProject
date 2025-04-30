@@ -1,7 +1,31 @@
 <div class="login-container">
-  <h2>Bienvenue sur le chat !</h2>
-  <div class="login-form" id="login-form">
-    <input type="text" id="pseudo-input" [(ngModel)]="currentUser.pseudo" placeholder="Choisissez un pseudo">
-    <button type="submit" (click)="logIn()">Se connecter</button>
+  <div class="logo-container">
+    <!-- Logo placeholder -->
+    <div class="logo-placeholder">
+      <span>CHAT</span>
+    </div>
+  </div>
+
+  <div class="login-card">
+    <h2>Bienvenue sur le chat !</h2>
+    <p class="login-subtitle">Entrez votre pseudo pour commencer à discuter</p>
+
+    <div class="login-form" id="login-form">
+      <div class="input-group">
+        <label for="pseudo-input">Pseudo</label>
+        <input
+          type="text"
+          id="pseudo-input"
+          [(ngModel)]="currentUser.pseudo"
+          placeholder="Choisissez un pseudo">
+      </div>
+
+      <button type="submit" (click)="logIn()">
+        <span class="button-text">Se connecter</span>
+        <span class="button-icon">→</span>
+      </button>
+
+      <p class="login-info">Vous serez identifié par la première lettre de votre pseudo</p>
+    </div>
   </div>
 </div>

@@ -1,15 +1,24 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, OnDestroy, HostListener } from '@angular/core';
 import { User } from '../../interfaces/user';
 import { Message } from '../../interfaces/message';
 import { MQTTCommunicationService } from '../../mqtt.service';
 import { UserService } from '../../user.service';
 import { Subscription } from 'rxjs';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   standalone: false,
-  styleUrls: ['./chat.component.css']
+  styleUrls: ['./chat.component.css'],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('200ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ])
+  ]
 })
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
@@ -18,6 +27,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   currentUser: User = { pseudo: 'Invité', avatar: 'I' };
   currentChannel: string = 'general';
   private userSubscription!: Subscription;
+  private channelSubscriptions: Subscription[] = [];
 
   channelMessages: Record<string, Message[]> = {
     'general': [],
@@ -63,19 +73,25 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // Unsubscribe from all MQTT topics
+    this.channelSubscriptions.forEach(sub => sub.unsubscribe());
     Object.keys(this.channelNames).forEach(channel => {
       this.mqttService.unsubscribe(`chat/${channel}`);
     });
   }
 
   ngAfterViewInit(): void {
-    this.scrollToBottom();
+    setTimeout(() => this.scrollToBottom(), 100);
+
+    // Set focus to message input
+    if (this.messageInput) {
+      this.messageInput.nativeElement.focus();
+    }
   }
 
   subscribeToChannels(): void {
     // Subscribe to each channel
     Object.keys(this.channelNames).forEach(channel => {
-      this.mqttService.observeTopic(`chat/${channel}`).subscribe((msg) => {
+      const subscription = this.mqttService.observeTopic(`chat/${channel}`).subscribe((msg) => {
         try {
           const msgData = JSON.parse(msg.payload.toString()) as Message;
 
@@ -85,19 +101,28 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
             // If it's the current channel, update view
             if (channel === this.currentChannel) {
-              this.scrollToBottom();
+              setTimeout(() => this.scrollToBottom(), 50);
             }
           }
         } catch (err) {
           console.error('Error parsing message:', err);
         }
       });
+
+      this.channelSubscriptions.push(subscription);
     });
   }
 
   changeChannel(channelId: string): void {
-    this.currentChannel = channelId;
-    setTimeout(() => this.scrollToBottom(), 0);
+    if (this.currentChannel !== channelId) {
+      this.currentChannel = channelId;
+      setTimeout(() => {
+        this.scrollToBottom();
+        if (this.messageInput) {
+          this.messageInput.nativeElement.focus();
+        }
+      }, 50);
+    }
   }
 
   sendMessage(): void {
@@ -117,7 +142,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
       // Clear input and scroll
       this.messageInput.nativeElement.value = '';
-      this.scrollToBottom();
+      setTimeout(() => this.scrollToBottom(), 50);
     }
   }
 
@@ -130,17 +155,24 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     this.channelMessages[this.currentChannel].push(messageData);
-    setTimeout(() => this.scrollToBottom(), 0);
+    setTimeout(() => this.scrollToBottom(), 50);
   }
 
   openChangePseudoPopup(): void {
     this.newPseudo = this.currentUser.pseudo;
     this.showChangePseudoPopup = true;
+    setTimeout(() => {
+      const input = document.querySelector('.popup input') as HTMLInputElement;
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }, 50);
   }
 
   confirmChangePseudo(): void {
     const newPseudo = this.newPseudo.trim();
-    if (newPseudo) {
+    if (newPseudo && newPseudo !== this.currentUser.pseudo) {
       const oldPseudo = this.currentUser.pseudo;
       this.currentUser.pseudo = newPseudo;
       this.currentUser.avatar = newPseudo.charAt(0).toUpperCase();
@@ -150,12 +182,20 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.addMessage('Système', `${oldPseudo} a changé son pseudo en ${newPseudo}.`, true);
       this.showChangePseudoPopup = false;
+    } else {
+      this.showChangePseudoPopup = false;
     }
   }
 
   openAddChannelPopup(): void {
     this.newChannelName = '';
     this.showAddChannelPopup = true;
+    setTimeout(() => {
+      const input = document.querySelector('.popup input') as HTMLInputElement;
+      if (input) {
+        input.focus();
+      }
+    }, 50);
   }
 
   addChannel(): void {
@@ -172,13 +212,13 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       this.channelMessages[channelId] = [];
 
       // Subscribe to new channel
-      this.mqttService.observeTopic(`chat/${channelId}`).subscribe((msg) => {
+      const subscription = this.mqttService.observeTopic(`chat/${channelId}`).subscribe((msg) => {
         try {
           const msgData = JSON.parse(msg.payload.toString()) as Message;
           if (msgData.author !== this.currentUser.pseudo) {
             this.channelMessages[channelId].push(msgData);
             if (channelId === this.currentChannel) {
-              this.scrollToBottom();
+              setTimeout(() => this.scrollToBottom(), 50);
             }
           }
         } catch (err) {
@@ -186,20 +226,34 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
 
+      this.channelSubscriptions.push(subscription);
+
       this.changeChannel(channelId);
       this.showAddChannelPopup = false;
+
+      // Add system message about new channel
+      this.addMessage('Système', `Salon #${channelName} créé par ${this.currentUser.pseudo}.`, true);
     }
   }
 
-  deleteChannel(channelId: string): void {
+  deleteChannel(channelId: string, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+
     if (confirm(`Êtes-vous sûr de vouloir supprimer le salon #${this.channelNames[channelId]} ?`)) {
       const isActive = this.currentChannel === channelId;
+      const channelName = this.channelNames[channelId];
+
+      // Clean up subscriptions
+      this.mqttService.unsubscribe(`chat/${channelId}`);
 
       delete this.channelNames[channelId];
       delete this.channelMessages[channelId];
 
       if (isActive) {
         this.changeChannel('general');
+        this.addMessage('Système', `Le salon #${channelName} a été supprimé.`, true);
       }
     }
   }
@@ -207,6 +261,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   isDefaultChannel(channelId: string): boolean {
     return ['general', 'aide', 'blabla', 'tech'].includes(channelId);
   }
+
 
   scrollToBottom(): void {
     try {
@@ -225,5 +280,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       event.preventDefault();
       this.sendMessage();
     }
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.scrollToBottom();
   }
 }
