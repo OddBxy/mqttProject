@@ -2,21 +2,20 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { MqttModule, IMqttServiceOptions } from 'ngx-mqtt';
 import { AppComponent } from './app.component';
-import {FormsModule} from '@angular/forms';
-import {RouterModule} from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ChatComponent } from './components/chat/chat.component';
 import { LoginComponent } from './components/login/login.component';
-
 import { AppRoutingModule } from './app-routing.module';
+import { MQTTCommunicationService } from './mqtt.service';
+import { UserService } from './user.service';
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  hostname: 'broker.hivemq.com',  // Exemple de broker public
-  port: 8000,                      // WebSocket port
-  path: '/mqtt',                  // souvent '/mqtt' pour WS
+  hostname: 'broker.hivemq.com',  // Public broker example
+  port: 8000,                     // WebSocket port
+  path: '/mqtt',                  // Often '/mqtt' for WS
   protocol: 'ws'
 };
-
-
 
 @NgModule({
   declarations: [AppComponent, ChatComponent, LoginComponent],
@@ -27,7 +26,7 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     FormsModule,
     RouterModule,
   ],
-  providers: [],
+  providers: [MQTTCommunicationService, UserService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

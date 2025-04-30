@@ -3,18 +3,37 @@ import { IMqttMessage, MqttService } from 'ngx-mqtt';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class MQTTCommunicationService {
-  constructor(private mqttService: MqttService) {}
+  constructor(private mqttService: MqttService) { }
 
-  // Souscription à un topic
+  /**
+   * Observe messages from a specific MQTT topic
+   * @param topic The topic to subscribe to
+   * @returns Observable of MQTT messages
+   */
   observeTopic(topic: string): Observable<IMqttMessage> {
     return this.mqttService.observe(topic);
   }
 
-  // Publication d'un message
+  /**
+   * Publish a message to an MQTT topic
+   * @param topic The topic to publish to
+   * @param message The message to publish
+   */
   publish(topic: string, message: string): void {
-    this.mqttService.unsafePublish(topic, message, { qos: 1, retain: false });
+    this.mqttService.unsafePublish(topic, message, {
+      qos: 1,
+      retain: false
+    });
+  }
+
+  /**
+   * Unsubscribe from a topic
+   * @param topic The topic to unsubscribe from
+   */
+  unsubscribe(topic: string): void {
+    //TODO: Implement unsubscribe logic if needed
   }
 }
