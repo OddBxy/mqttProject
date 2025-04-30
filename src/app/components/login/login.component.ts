@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { User } from "../../interfaces/user";
-import { Router } from "@angular/router";
-import { UserService } from '../../user.service';
+import {Component} from '@angular/core';
+import {User} from "../../interfaces/user";
+import {Router} from "@angular/router";
+import {UserService} from '../../user.service';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +15,8 @@ export class LoginComponent {
   constructor(
     private router: Router,
     private userService: UserService
-  ) {}
+  ) {
+  }
 
   logIn(): void {
     const pseudoInput = this.currentUser.pseudo.trim();

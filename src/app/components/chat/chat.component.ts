@@ -1,10 +1,10 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, OnDestroy, HostListener } from '@angular/core';
-import { User } from '../../interfaces/user';
-import { Message } from '../../interfaces/message';
-import { MQTTCommunicationService } from '../../mqtt.service';
-import { UserService } from '../../user.service';
-import { Subscription } from 'rxjs';
-import { trigger, transition, style, animate } from '@angular/animations';
+import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {User} from '../../interfaces/user';
+import {Message} from '../../interfaces/message';
+import {MQTTCommunicationService} from '../../mqtt.service';
+import {UserService} from '../../user.service';
+import {Subscription} from 'rxjs';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-chat',
@@ -14,44 +14,41 @@ import { trigger, transition, style, animate } from '@angular/animations';
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(10px)' }),
-        animate('200ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+        style({opacity: 0, transform: 'translateY(10px)'}),
+        animate('200ms ease-out', style({opacity: 1, transform: 'translateY(0)'}))
       ])
     ])
   ]
 })
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
-  @ViewChild('messageInput') private messageInput!: ElementRef;
-
-  currentUser: User = { pseudo: 'Invité', avatar: 'I' };
+  currentUser: User = {pseudo: 'Invité', avatar: 'I'};
   currentChannel: string = 'general';
-  private userSubscription!: Subscription;
-  private channelSubscriptions: Subscription[] = [];
-
   channelMessages: Record<string, Message[]> = {
     'general': [],
     'aide': [],
     'blabla': [],
     'tech': []
   };
-
   channelNames: Record<string, string> = {
     'general': 'général',
     'aide': 'aide & support',
     'blabla': 'blabla',
     'tech': 'technologie'
   };
-
   showChangePseudoPopup: boolean = false;
   showAddChannelPopup: boolean = false;
   newPseudo: string = '';
   newChannelName: string = '';
+  @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
+  @ViewChild('messageInput') private messageInput!: ElementRef;
+  private userSubscription!: Subscription;
+  private channelSubscriptions: Subscription[] = [];
 
   constructor(
     private mqttService: MQTTCommunicationService,
     private userService: UserService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     // Subscribe to user changes

@@ -14,13 +14,13 @@
       <div class="input-group">
         <label for="pseudo-input">Pseudo</label>
         <input
-          type="text"
-          id="pseudo-input"
           [(ngModel)]="currentUser.pseudo"
-          placeholder="Choisissez un pseudo">
+          id="pseudo-input"
+          placeholder="Choisissez un pseudo"
+          type="text">
       </div>
 
-      <button type="submit" (click)="logIn()">
+      <button (click)="logIn()" type="submit">
         <span class="button-text">Se connecter</span>
         <span class="button-icon">→</span>
       </button>

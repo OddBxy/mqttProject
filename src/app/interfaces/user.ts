@@ -1,4 +1,4 @@
 export interface User {
-        pseudo: string;
-        avatar: string;
+  pseudo: string;
+  avatar: string;
 }

@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
-import { IMqttMessage, MqttService } from 'ngx-mqtt';
-import { Observable } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {IMqttMessage, MqttService} from 'ngx-mqtt';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MQTTCommunicationService {
-  constructor(private mqttService: MqttService) { }
+  constructor(private mqttService: MqttService) {
+  }
 
   /**
    * Observe messages from a specific MQTT topic
