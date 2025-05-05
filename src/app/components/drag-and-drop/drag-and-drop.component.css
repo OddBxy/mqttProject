@@ -1,0 +1,9 @@
+.drag-drop-container {
+  border: 2px dashed transparent;
+  transition: border-color 0.3s ease;
+  position: relative;
+}
+
+.drag-drop-container.dragover {
+  border-color: var(--primary-color);
+}

@@ -20,18 +20,20 @@
           type="text">
       </div>
 
-      <div class="profile-photo-container">
-        <div class="profile-photo" [style.backgroundImage]="getProfilePhotoBackground()">
-          <div *ngIf="!currentUser.photoURL" class="default-avatar">
-            {{ getInitials(currentUser.pseudo) }}
-          </div>
-          <div class="photo-overlay">
-            <button (click)="selectProfilePhoto()" class="change-photo-btn">
-              <span class="photo-icon">📷</span>
-            </button>
+      <app-drag-and-drop (fileDropped)="selectProfilePhotoFromDrop($event)">
+        <div class="profile-photo-container">
+          <div class="profile-photo" [style.backgroundImage]="getProfilePhotoBackground()">
+            <div *ngIf="!currentUser.photoURL" class="default-avatar">
+              {{ getInitials(currentUser.pseudo) }}
+            </div>
+            <div class="photo-overlay">
+              <button (click)="selectProfilePhoto()" class="change-photo-btn">
+                <span class="photo-icon">📷</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </app-drag-and-drop>
 
       <button (click)="logIn()" type="submit">
         <span class="button-text">Se connecter</span>

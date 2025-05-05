@@ -616,3 +616,12 @@
 .popup .photo-icon {
   font-size: 22px;
 }
+
+.profile-photo-container {
+  border: 2px dashed transparent;
+  transition: border-color 0.3s ease;
+}
+
+.profile-photo-container.dragover {
+  border-color: var(--primary-color);
+}

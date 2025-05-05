@@ -9,6 +9,7 @@ import {LoginComponent} from './components/login/login.component';
 import {AppRoutingModule} from './app-routing.module';
 import {MQTTCommunicationService} from './mqtt.service';
 import {UserService} from './user.service';
+import { DragAndDropComponent } from './components/drag-and-drop/drag-and-drop.component';
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: 'broker.hivemq.com',  // Public broker example
@@ -25,6 +26,7 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     AppRoutingModule,
     FormsModule,
     RouterModule,
+    DragAndDropComponent,
   ],
   providers: [MQTTCommunicationService, UserService],
   bootstrap: [AppComponent],
