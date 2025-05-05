@@ -116,16 +116,17 @@
   <div class="popup">
     <h3>Modifier mon profil</h3>
 
-    <div class="profile-photo-container">
-      <div class="profile-photo" [style.backgroundImage]="getUserPhotoBackground(currentUser)">
-        <div *ngIf="!currentUser.photoURL" class="default-avatar">{{ getInitials(currentUser.pseudo) }}</div>
-        <div class="photo-overlay">
-          <button (click)="changeProfilePhoto()" class="change-photo-btn">
-            <span class="photo-icon">📷</span>
-          </button>
+    <app-drag-and-drop (fileDropped)="onAvatarDrop($event)">
+      <div class="profile-photo-container">
+        <div class="profile-photo" [style.background-image]="currentUser.photoURL ? 'url(' + currentUser.photoURL + ')' : 'none'">
+          <div class="photo-overlay">
+            <button class="change-photo-btn" (click)="changeProfilePhoto()">
+              <i class="photo-icon">📷</i>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </app-drag-and-drop>
 
     <div class="input-group">
       <label for="new-pseudo">Pseudo</label>

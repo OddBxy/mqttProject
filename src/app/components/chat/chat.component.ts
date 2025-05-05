@@ -428,18 +428,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     input.onchange = (event: Event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (file) {
-        // Limiter la taille du fichier à 1MB
-        if (file.size > 1024 * 1024) {
-          alert('La taille de l\'image ne doit pas dépasser 1MB.');
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.currentUser.photoURL = reader.result as string;
-          this.userService.updateUser({...this.currentUser});
-        };
-        reader.readAsDataURL(file);
+        this.onAvatarDrop(file)
       }
     };
 
@@ -463,4 +452,19 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
   }
+  onAvatarDrop(file: File): void {
+    if (file.size > 1024 * 1024) {
+      alert('La taille de l\'image ne doit pas dépasser 1MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.currentUser.photoURL = reader.result as string;
+      this.userService.updateUser({ ...this.currentUser });
+    };
+    reader.readAsDataURL(file);
+  }
+
+
 }

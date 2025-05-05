@@ -83,4 +83,17 @@ export class LoginComponent {
     if (!name) return '?';
     return name.charAt(0).toUpperCase();
   }
+
+  selectProfilePhotoFromDrop(file: File): void {
+    if (file.size > 1024 * 1024) {
+      alert('La taille de l\'image ne doit pas dépasser 1MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.currentUser.photoURL = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
 }
