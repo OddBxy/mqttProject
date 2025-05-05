@@ -30,11 +30,4 @@ export class MQTTCommunicationService {
     });
   }
 
-  /**
-   * Unsubscribe from a topic
-   * @param topic The topic to unsubscribe from
-   */
-  unsubscribe(topic: string): void {
-    //TODO: Implement unsubscribe logic if needed
-  }
 }

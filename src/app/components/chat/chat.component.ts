@@ -62,9 +62,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Unsubscribe from all MQTT topics
     this.channelSubscriptions.forEach(sub => sub.unsubscribe());
-    Object.keys(this.channelNames).forEach(channel => {
-      this.mqttService.unsubscribe(`chat/${channel}`);
-    });
+    this.channelSubscriptions = [];
   }
 
   ngAfterViewInit(): void {
@@ -234,7 +232,12 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       const channelName = this.channelNames[channelId];
 
       // Clean up subscriptions
-      this.mqttService.unsubscribe(`chat/${channelId}`);
+        const subscriptionIndex = this.channelSubscriptions.findIndex(sub => sub.closed);
+        const subscription = this.channelSubscriptions[subscriptionIndex];
+        if (subscription) {
+            subscription.unsubscribe();
+            this.channelSubscriptions.splice(subscriptionIndex, 1);
+        }
 
       delete this.channelNames[channelId];
       delete this.channelMessages[channelId];
