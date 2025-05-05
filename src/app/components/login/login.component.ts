@@ -50,7 +50,7 @@ export class LoginComponent {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (file) {
         // Limiter la taille du fichier à 1MB
-        if (file.size > 1024 * 1024) {
+        if (file.size > 10* 1024 * 1024) {
           alert('La taille de l\'image ne doit pas dépasser 1MB.');
           return;
         }
@@ -85,7 +85,7 @@ export class LoginComponent {
   }
 
   selectProfilePhotoFromDrop(file: File): void {
-    if (file.size > 1024 * 1024) {
+    if (file.size > 10 * 1024 * 1024) {
       alert('La taille de l\'image ne doit pas dépasser 1MB.');
       return;
     }

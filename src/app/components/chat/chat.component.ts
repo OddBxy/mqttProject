@@ -444,8 +444,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onImageDrop(file: File): void {
-    if (file.size > 1024 * 1024) {
-      alert('La taille de l\'image ne doit pas dépasser 1MB.');
+    if (file.size > 10 * 1024 * 1024) {
+      alert('La taille de l\'image ne doit pas dépasser 10MB.');
       return;
     }
     this.fileReader(file)
