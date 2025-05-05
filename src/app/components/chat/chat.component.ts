@@ -331,4 +331,37 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   onResize(): void {
     this.scrollToBottom();
   }
+
+  select_sendImage(): void {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (event: Event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64Image = reader.result as string;
+          const messageData: Message = {
+            author: this.currentUser.pseudo,
+            content: base64Image,
+            time: new Date(),
+            isSystem: false,
+          };
+
+          // Ajouter l'image au tableau local
+          this.channelMessages[this.currentChannel].push(messageData);
+
+          // Publier l'image via MQTT
+          this.mqttService.publish(`chat/${this.currentChannel}`, JSON.stringify(messageData));
+
+          // Faire défiler vers le bas
+          setTimeout(() => this.scrollToBottom(), 50);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  }
+
 }

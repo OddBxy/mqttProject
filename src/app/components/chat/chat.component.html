@@ -62,7 +62,10 @@
               </div>
             </div>
           </div>
-          <div class="message-content">{{ msg.content }}</div>
+          <div class="message-content">
+            <img *ngIf="msg.content.startsWith('data:image')" [src]="msg.content" alt="Image received" class="received-image">
+            <span *ngIf="!msg.content.startsWith('data:image')">{{ msg.content }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -72,6 +75,9 @@
                   (keypress)="onKeyPress($event)"
                   class="message-input"
                   placeholder="Écrivez votre message..."></textarea>
+        <button (click)="select_sendImage()" class="send-button">
+          <i class="fas fa-image">🖼️</i>
+        </button>
         <button (click)="sendMessage()" class="send-button">
           <svg fill="none" height="18" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="18">
             <line x1="22" x2="11" y1="2" y2="13"></line>

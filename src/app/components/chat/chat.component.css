@@ -499,3 +499,10 @@
     max-width: 90%;
   }
 }
+
+.received-image {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  margin-top: 5px;
+}
