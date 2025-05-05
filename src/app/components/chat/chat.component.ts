@@ -49,7 +49,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     // Add welcome message
-    this.addMessage('Système', `Bienvenue ${this.currentUser.pseudo} ! Vous êtes maintenant connecté au salon #général.`, true);
+    this.broadcastMessage(`Bienvenue ${this.currentUser.pseudo} ! Vous êtes maintenant connecté au salon #général.`);
 
     // Subscribe to MQTT topics for all channels
     this.subscribeToChannels();
@@ -85,7 +85,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
           const msgData = JSON.parse(msg.payload.toString()) as Message;
 
           // Only process if it's not from current user
-          if (msgData.author !== this.currentUser.pseudo) {
+          if (msgData.author.pseudo !== this.currentUser.pseudo) {
             this.channelMessages[channel].push(msgData);
 
             // If it's the current channel, update view
@@ -138,7 +138,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     const content = this.messageInput.nativeElement.value.trim();
     if (content) {
       const messageData: Message = {
-        author: this.currentUser.pseudo,
+        author: this.currentUser,
         content,
         time: new Date(),
       };
@@ -155,7 +155,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  addMessage(author: string, content: string, isSystem = false, isMyMessage = false): void {
+  addMessage(author: User, content: string, isSystem = false, isMyMessage = false): void {
     const messageData: Message = {
       author,
       content,
@@ -181,7 +181,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   broadcastMessage(message: string): void {
     const messageData: Message = {
-      author : "Système",
+      author : {pseudo : "Système", avatar : "S"},
       content: message,
       time: new Date(),
       isSystem: true,
@@ -196,7 +196,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   annonceChannel(type : 'channel_created' | 'channel_deleted', channelName : string) {
     const messageData: Message = {
-      author : "Système",
+      author : {pseudo : "Système", avatar : "S"},
       content: '',
       time: new Date(),
       isSystem: true,
@@ -258,7 +258,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       const subscription = this.mqttService.observeTopic(`chat/${channelId}`).subscribe((msg) => {
         try {
           const msgData = JSON.parse(msg.payload.toString()) as Message;
-          if (msgData.author !== this.currentUser.pseudo) {
+          if (msgData.author.pseudo !== this.currentUser.pseudo) {
             this.channelMessages[channelId].push(msgData);
             if (channelId === this.currentChannel) {
               setTimeout(() => this.scrollToBottom(), 50);
@@ -343,7 +343,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         reader.onload = () => {
           const base64Image = reader.result as string;
           const messageData: Message = {
-            author: this.currentUser.pseudo,
+            author: this.currentUser,
             content: base64Image,
             time: new Date(),
             isSystem: false,
