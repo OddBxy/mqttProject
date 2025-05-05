@@ -1,7 +1,8 @@
 import {SystemMessageContent} from './system-message-content';
+import { User } from './user';
 
 export interface Message {
-  author: string;
+  author: User;
   content: string;
   time: Date;
   isSystem?: boolean;
