@@ -57,12 +57,9 @@ body {
   padding: 40px;
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
 
-.login-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-}
 
 .login-card h2 {
   margin: 0 0 10px;
@@ -130,7 +127,6 @@ body {
 }
 
 .login-form button:hover {
-  background-color: var(--primary-color-light);
   transform: translateY(-2px);
 }
 
@@ -165,7 +161,7 @@ body {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background-color: #e0e0e0;
+  background-color: none;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -192,7 +188,6 @@ body {
   left: 0;
   right: 0;
   background: rgba(0, 0, 0, 0.5);
-  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,24 +195,25 @@ body {
   transition: opacity 0.3s ease;
 }
 
+.profile-photo:hover .default-avatar{
+    opacity: 0.3;
+}
 .profile-photo:hover .photo-overlay {
   opacity: 1;
+  background-color: transparent;
 }
 
 .change-photo-btn {
-  background: transparent;
+  background-color: none;
   border: none;
   color: white;
-  font-size: 20px;
+  font-size: 30px;
   cursor: pointer;
   width: 100%;
   height: 100%;
-  transition: background-color 0.3s;
 }
 
-.change-photo-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
+
 
 .photo-icon {
   font-size: 22px;
