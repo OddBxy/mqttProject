@@ -397,10 +397,12 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
    * Pour les autres utilisateurs, on pourrait stocker leurs photos dans un mappage
    */
   getAuthorPhoto(author: User): string | null {
+    if (author.photoURL) {
+      return author.photoURL;
+    }
     if (author.pseudo === this.currentUser.pseudo && this.currentUser.photoURL) {
       return this.currentUser.photoURL;
     }
-    // Implémentation future : stocker les photos des autres utilisateurs
     return null;
   }
 
