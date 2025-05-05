@@ -2,7 +2,9 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="user-info">
-      <div class="user-avatar">{{ getInitials(currentUser.pseudo) }}</div>
+      <div class="user-avatar" [style.backgroundImage]="getUserPhotoBackground(currentUser)">
+        <div *ngIf="!currentUser.photoURL" class="avatar-initials">{{ getInitials(currentUser.pseudo) }}</div>
+      </div>
       <div class="user-name">{{ currentUser.pseudo }}</div>
       <button (click)="openChangePseudoPopup()" class="change-pseudo-btn">
         <i class="fas fa-edit">✏️</i>
@@ -54,7 +56,9 @@
              [class.system-message]="msg.isSystem"
              class="message">
           <div *ngIf="isFirst || channelMessages[currentChannel][i-1]?.author !== msg.author" class="message-header">
-            <div *ngIf="!msg.isSystem" class="message-author-avatar">{{ getInitials(msg.author.pseudo) }}</div>
+            <div *ngIf="!msg.isSystem" class="message-author-avatar" [style.backgroundImage]="getAuthorPhotoBackground(msg.author)">
+              <div *ngIf="!getAuthorPhoto(msg.author)" class="avatar-initials">{{ getInitials(msg.author.pseudo) }}</div>
+            </div>
             <div class="message-author-info">
               <div class="message-author">{{ msg.author.pseudo }}</div>
               <div class="message-time">
@@ -97,8 +101,24 @@
 <!-- Change Pseudo Popup -->
 <div *ngIf="showChangePseudoPopup" class="popup-overlay">
   <div class="popup">
-    <h3>Changer de pseudo</h3>
-    <input [(ngModel)]="newPseudo" placeholder="Nouveau pseudo" type="text">
+    <h3>Modifier mon profil</h3>
+
+    <div class="profile-photo-container">
+      <div class="profile-photo" [style.backgroundImage]="getUserPhotoBackground(currentUser)">
+        <div *ngIf="!currentUser.photoURL" class="default-avatar">{{ getInitials(currentUser.pseudo) }}</div>
+        <div class="photo-overlay">
+          <button (click)="changeProfilePhoto()" class="change-photo-btn">
+            <span class="photo-icon">📷</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label for="new-pseudo">Pseudo</label>
+      <input [(ngModel)]="newPseudo" id="new-pseudo" placeholder="Nouveau pseudo" type="text">
+    </div>
+
     <div class="popup-buttons">
       <button (click)="showChangePseudoPopup = false" class="popup-button cancel-button">Annuler</button>
       <button (click)="confirmChangePseudo()" class="popup-button confirm-button">Confirmer</button>

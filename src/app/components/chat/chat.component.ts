@@ -4,6 +4,8 @@ import {Message} from '../../interfaces/message';
 import {MQTTCommunicationService} from '../../mqtt.service';
 import {UserService} from '../../user.service';
 import {Subscription} from 'rxjs';
+import {DomSanitizer, SafeStyle} from '@angular/platform-browser';
+
 
 @Component({
   selector: 'app-chat',
@@ -38,9 +40,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private mqttService: MQTTCommunicationService,
-    private userService: UserService
-  ) {
-  }
+    private userService: UserService,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit(): void {
     // Subscribe to user changes
@@ -167,17 +169,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => this.scrollToBottom(), 50);
   }
 
-  openChangePseudoPopup(): void {
-    this.newPseudo = this.currentUser.pseudo;
-    this.showChangePseudoPopup = true;
-    setTimeout(() => {
-      const input = document.querySelector('.popup input') as HTMLInputElement;
-      if (input) {
-        input.focus();
-        input.select();
-      }
-    }, 50);
-  }
 
   broadcastMessage(message: string): void {
     const messageData: Message = {
@@ -361,6 +352,95 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         reader.readAsDataURL(file);
       }
     };
+    input.click();
+  }
+
+  onAvatarChange(event: Event):void{
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64Image = reader.result as string;
+        this.currentUser.avatar = base64Image;
+
+        // Mettre à jour l'utilisateur via le service
+        this.userService.updateUser({...this.currentUser});
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  /**
+   * Obtient l'URL de l'image de fond pour l'avatar de l'utilisateur
+   */
+  getUserPhotoBackground(user: User): SafeStyle {
+    if (user.photoURL) {
+      return this.sanitizer.bypassSecurityTrustStyle(`url(${user.photoURL})`);
+    }
+    return 'none';
+  }
+
+  /**
+   * Obtient l'URL de l'image de fond pour l'avatar de l'auteur d'un message
+   */
+  getAuthorPhotoBackground(author: User): SafeStyle {
+    const photo = this.getAuthorPhoto(author);
+    if (photo) {
+      return this.sanitizer.bypassSecurityTrustStyle(`url(${photo})`);
+    }
+    return 'none';
+  }
+
+  /**
+   * Obtient l'URL de la photo de l'auteur d'un message
+   * Si c'est l'utilisateur actuel, utilisez sa photo
+   * Pour les autres utilisateurs, on pourrait stocker leurs photos dans un mappage
+   */
+  getAuthorPhoto(author: User): string | null {
+    if (author.pseudo === this.currentUser.pseudo && this.currentUser.photoURL) {
+      return this.currentUser.photoURL;
+    }
+    // Implémentation future : stocker les photos des autres utilisateurs
+    return null;
+  }
+
+// Mettre à jour le popup de changement de pseudo pour inclure l'option de changer la photo
+
+  openChangePseudoPopup(): void {
+    this.newPseudo = this.currentUser.pseudo;
+    this.showChangePseudoPopup = true;
+    setTimeout(() => {
+      const input = document.querySelector('.popup input') as HTMLInputElement;
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }, 50);
+  }
+
+  changeProfilePhoto(): void {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+
+    input.onchange = (event: Event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // Limiter la taille du fichier à 1MB
+        if (file.size > 1024 * 1024) {
+          alert('La taille de l\'image ne doit pas dépasser 1MB.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.currentUser.photoURL = reader.result as string;
+          this.userService.updateUser({...this.currentUser});
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
     input.click();
   }
 

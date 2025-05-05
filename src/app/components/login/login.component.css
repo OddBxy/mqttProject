@@ -152,3 +152,73 @@ body {
   color: var(--text-light);
   margin: 0;
 }
+
+/* Styles pour la photo de profil */
+.profile-photo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.profile-photo {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.default-avatar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: bold;
+  color: white;
+  background-color: var(--primary-color);
+}
+
+.photo-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-photo:hover .photo-overlay {
+  opacity: 1;
+}
+
+.change-photo-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  transition: background-color 0.3s;
+}
+
+.change-photo-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.photo-icon {
+  font-size: 22px;
+}
