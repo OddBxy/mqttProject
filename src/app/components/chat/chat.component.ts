@@ -210,6 +210,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         this.mqttService.publish(`chat/channel_log`, JSON.stringify(messageData));
       }
     }else{
+      if (this.channelNames[channelName]) {
+        alert('Un salon avec ce nom existe déjà !');
+        return;
+      }
       this.mqttService.publish(`chat/channel_log`, JSON.stringify(messageData));
     }
   }
@@ -247,11 +251,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     if (channelName) {
       const channelId = channelName.toLowerCase().replace(/\s+/g, '-');
 
-      if (this.channelNames[channelId]) {
-        alert('Un salon avec ce nom existe déjà !');
-        return;
-      }
-
       this.channelNames[channelId] = channelName;
       this.channelMessages[channelId] = [];
 
@@ -272,7 +271,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.channelSubscriptions.push(subscription);
 
-      this.changeChannel(channelId);
       this.showAddChannelPopup = false;
 
       // Add system message about new channel
