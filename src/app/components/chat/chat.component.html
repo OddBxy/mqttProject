@@ -23,7 +23,7 @@
             <span class="channel-icon">#</span>
             <span class="channel-name">{{ item.value }}</span>
           </div>
-          <span (click)="deleteChannel(item.key)" *ngIf="!isDefaultChannel(item.key)"
+          <span (click)="annonceChannel('channel_deleted', item.key)" *ngIf="!isDefaultChannel(item.key)"
                 class="delete-channel">
             <svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16">
               <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
@@ -102,7 +102,7 @@
     <input [(ngModel)]="newChannelName" placeholder="Nom du salon" type="text">
     <div class="popup-buttons">
       <button (click)="showAddChannelPopup = false" class="popup-button cancel-button">Annuler</button>
-      <button (click)="addChannel()" class="popup-button confirm-button">Ajouter</button>
+      <button (click)="annonceChannel('channel_created',newChannelName) " class="popup-button confirm-button">Ajouter</button>
     </div>
   </div>
 </div>

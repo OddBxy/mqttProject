@@ -121,11 +121,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         if(msgData.isSystem && msgData.SystemMessage) {
             const systemMessage = msgData.SystemMessage;
             if (systemMessage.type === 'channel_created') {
-                this.channelNames[systemMessage.channelName] = systemMessage.channelName;
-                this.channelMessages[systemMessage.channelName] = [];
+                this.addChannel(systemMessage.channelName);
             } else if (systemMessage.type === 'channel_deleted') {
-                delete this.channelNames[systemMessage.channelName];
-                delete this.channelMessages[systemMessage.channelName];
+                this.deleteChannel(systemMessage.channelName);
             }
         }
       } catch (err) {
@@ -190,7 +188,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     setTimeout(() => this.scrollToBottom(), 50);
     for (const channel in this.channelMessages) {
-      this.mqttService.publish(`chat/${channel}`, JSON.stringify(messageData));
+      if (channel !==  'channel_log') {
+        this.mqttService.publish(`chat/${channel}`, JSON.stringify(messageData));
+      }
     }
   }
 
@@ -205,7 +205,13 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         channelName
       }
     }
-    this.mqttService.publish(`chat/channel_log`, JSON.stringify(messageData));
+    if (type === 'channel_deleted') {
+      if (confirm(`Êtes-vous sûr de vouloir supprimer le salon #${channelName} ?`)) {
+        this.mqttService.publish(`chat/channel_log`, JSON.stringify(messageData));
+      }
+    }else{
+      this.mqttService.publish(`chat/channel_log`, JSON.stringify(messageData));
+    }
   }
 
   confirmChangePseudo(): void {
@@ -236,8 +242,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 50);
   }
 
-  addChannel(): void {
-    const channelName = this.newChannelName.trim();
+  addChannel(channelName: string): void {
+    console.log("addChannel", channelName);
     if (channelName) {
       const channelId = channelName.toLowerCase().replace(/\s+/g, '-');
 
@@ -270,18 +276,17 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showAddChannelPopup = false;
 
       // Add system message about new channel
-        this.broadcastMessage(`Salon #${channelName} créé par ${this.currentUser.pseudo}.`);
-        this.annonceChannel('channel_created', channelId);
+      this.broadcastMessage(`Salon #${channelName} créé par ${this.currentUser.pseudo}.`);
     }
   }
 
   deleteChannel(channelId: string, event?: Event): void {
+    //print for debug
+    console.log("deleteChannel", channelId);
     if (event) {
       event.stopPropagation();
     }
-
-    if (confirm(`Êtes-vous sûr de vouloir supprimer le salon #${this.channelNames[channelId]} ?`)) {
-      const isActive = this.currentChannel === channelId;
+     const isActive = this.currentChannel === channelId;
       const channelName = this.channelNames[channelId];
 
       // Clean up subscriptions
@@ -297,10 +302,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
       if (isActive) {
         this.changeChannel('general');
-        this.broadcastMessage(`Salon #${channelName} supprimé par ${this.currentUser.pseudo}.`);
-        this.annonceChannel('channel_deleted', channelId);
-      }
-    }
+        this.broadcastMessage(`Salon #${channelName} supprimé par ${this.currentUser.pseudo}.`);}
   }
 
   isDefaultChannel(channelId: string): boolean {
