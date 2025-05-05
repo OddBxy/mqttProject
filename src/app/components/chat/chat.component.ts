@@ -309,6 +309,22 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   @HostListener('window:resize')
   onResize(): void {
     this.scrollToBottom();
+
+    const sidebar = document.querySelector(".sidebar") as HTMLElement | null;
+    const main = document.querySelector(".main-content") as HTMLElement | null;
+  
+    if (sidebar && main) {
+      if (window.innerWidth >= 768) {
+        // En desktop : forcer visible
+        sidebar.style.display = "flex";
+        main.style.display = "flex";
+      } else {
+        // En mobile : retirer les styles forcés pour laisser le CSS agir
+        sidebar.style.display = "";
+        main.style.display = "";
+      }
+    }
+  
   }
 
   select_sendImage(): void {
@@ -427,8 +443,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
           }
 
       }
-
   }
+
+
   onAvatarDrop(file: File): void {
     if (file.size > 1024 * 1024) {
       alert('La taille de l\'image ne doit pas dépasser 1MB.');
