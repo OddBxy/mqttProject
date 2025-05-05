@@ -157,18 +157,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  addMessage(author: User, content: string, isSystem = false, isMyMessage = false): void {
-    const messageData: Message = {
-      author,
-      content,
-      time: new Date(),
-      isSystem,
-    };
-
-    this.channelMessages[this.currentChannel].push(messageData);
-    setTimeout(() => this.scrollToBottom(), 50);
-  }
-
 
   broadcastMessage(message: string): void {
     const messageData: Message = {
@@ -462,6 +450,34 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     reader.onload = () => {
       this.currentUser.photoURL = reader.result as string;
       this.userService.updateUser({ ...this.currentUser });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  onImageDrop(file: File): void {
+    if (file.size > 1024 * 1024) {
+      alert('La taille de l\'image ne doit pas dépasser 1MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Image = reader.result as string;
+      const messageData: Message = {
+        author: this.currentUser,
+        content: base64Image,
+        time: new Date(),
+        isSystem: false,
+      };
+
+      // Ajouter l'image au tableau local
+      this.channelMessages[this.currentChannel].push(messageData);
+
+      // Publier l'image via MQTT
+      this.mqttService.publish(`chat/${this.currentChannel}`, JSON.stringify(messageData));
+
+      // Faire défiler vers le bas
+      setTimeout(() => this.scrollToBottom(), 50);
     };
     reader.readAsDataURL(file);
   }
