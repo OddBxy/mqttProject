@@ -4,21 +4,12 @@ import {Message} from '../../interfaces/message';
 import {MQTTCommunicationService} from '../../mqtt.service';
 import {UserService} from '../../user.service';
 import {Subscription} from 'rxjs';
-import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   standalone: false,
   styleUrls: ['./chat.component.css'],
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({opacity: 0, transform: 'translateY(10px)'}),
-        animate('200ms ease-out', style({opacity: 1, transform: 'translateY(0)'}))
-      ])
-    ])
-  ]
 })
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   currentUser: User = {pseudo: 'Invité', avatar: 'I'};
