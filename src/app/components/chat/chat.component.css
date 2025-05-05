@@ -8,7 +8,7 @@
 
 /* SIDEBAR STYLING */
 .sidebar {
-  width: 280px;
+  width: 18%;
   background-color: var(--sidebar-bg);
   color: var(--sidebar-text);
   padding: 16px 0;
@@ -16,6 +16,15 @@
   flex-direction: column;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   z-index: 2;
+}
+
+
+.sidebar-toggle{
+    display: none;
+}
+
+.sidebar-toggle button {
+    padding: 70%;
 }
 
 .user-info {
@@ -197,6 +206,7 @@
   font-weight: bold;
   display: flex;
   align-items: center;
+  gap: 10%
 }
 
 .channel-hash {
@@ -496,6 +506,38 @@
   .message {
     max-width: 90%;
   }
+
+
+  .sidebar {
+    width: 100%;
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .main-content{
+      display: flex;
+  }
+
+  .sidebar-toggle{
+      display: flex;
+  }
+
+  .sidebar-toggle button{
+      background-color:  var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 20%;
+  }
+
+  .message.my-message {
+    background-color: var(--my-message-bg, #e3f2fd);
+    align-self: flex-start;
+    border-bottom-right-radius: 4px;
+  }
+
 }
 
 .received-image {

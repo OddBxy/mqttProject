@@ -446,4 +446,21 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     input.click();
   }
 
+
+  displaySideBar() : void {
+      const sidebar = document.querySelector(".sidebar") as HTMLElement | null;
+      const main = document.querySelector(".main-content") as HTMLElement | null;
+      if(sidebar && main){
+          if(getComputedStyle(sidebar).display === "none") {
+              sidebar.style.display = "flex";
+              main.style.display = "none";
+          }
+          else if(getComputedStyle(sidebar).display === "flex") {
+              sidebar.style.display = "none";
+              main.style.display = "flex";
+          }
+
+      }
+
+  }
 }
