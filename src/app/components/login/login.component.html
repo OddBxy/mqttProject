@@ -8,7 +8,7 @@
 
   <div class="login-card">
     <h2>Bienvenue sur le chat !</h2>
-    <p class="login-subtitle">Entrez votre pseudo pour commencer à discuter</p>
+    <p class="login-subtitle">Entrez votre pseudo et choisissez une photo de profil</p>
 
     <div class="login-form" id="login-form">
       <div class="input-group">
@@ -20,12 +20,25 @@
           type="text">
       </div>
 
+      <div class="profile-photo-container">
+        <div class="profile-photo" [style.backgroundImage]="getProfilePhotoBackground()">
+          <div *ngIf="!currentUser.photoURL" class="default-avatar">
+            {{ getInitials(currentUser.pseudo) }}
+          </div>
+          <div class="photo-overlay">
+            <button (click)="selectProfilePhoto()" class="change-photo-btn">
+              <span class="photo-icon">📷</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <button (click)="logIn()" type="submit">
         <span class="button-text">Se connecter</span>
         <span class="button-icon">→</span>
       </button>
 
-      <p class="login-info">Vous serez identifié par la première lettre de votre pseudo</p>
+      <p class="login-info">Vous pouvez personnaliser votre profil avec une photo</p>
     </div>
   </div>
 </div>
