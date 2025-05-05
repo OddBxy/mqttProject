@@ -9,6 +9,11 @@
       <button (click)="openChangePseudoPopup()" class="change-pseudo-btn">
         <i class="fas fa-edit">✏️</i>
       </button>
+      <div class="sidebar-toggle">
+          <button type="button" name="button" (click)="displaySideBar()">
+              >
+          </button>
+      </div>
     </div>
     <div class="channels-header">
       <span>SALONS</span>
@@ -43,8 +48,16 @@
     <div class="chat-header">
       <div class="current-channel-info">
         <div class="current-channel-name">
-          <span class="channel-hash">#</span>
-          <span>{{ channelNames[currentChannel] }}</span>
+            <div class="sidebar-toggle">
+                <button type="button" name="button" (click)="displaySideBar()">
+                    <
+                </button>
+            </div>
+            <div>
+                <span class="channel-hash">#</span>
+                <span>{{ channelNames[currentChannel] }}</span>
+            </div>
+
         </div>
       </div>
     </div>
