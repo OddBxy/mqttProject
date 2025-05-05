@@ -198,6 +198,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     if (type === 'channel_deleted') {
       if (confirm(`Êtes-vous sûr de vouloir supprimer le salon #${channelName} ?`)) {
+        this.broadcastMessage(`Salon #${channelName} supprimé par ${this.currentUser.pseudo}.`);
         this.mqttService.publish(`chat/channel_log`, JSON.stringify(messageData));
       }
     }else{
@@ -205,6 +206,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         alert('Un salon avec ce nom existe déjà !');
         return;
       }
+      this.broadcastMessage(`Salon #${channelName} créé par ${this.currentUser.pseudo}.`);
       this.mqttService.publish(`chat/channel_log`, JSON.stringify(messageData));
     }
   }
@@ -264,8 +266,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.showAddChannelPopup = false;
 
-      // Add system message about new channel
-      this.broadcastMessage(`Salon #${channelName} créé par ${this.currentUser.pseudo}.`);
     }
   }
 
@@ -291,7 +291,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
       if (isActive) {
         this.changeChannel('general');
-        this.broadcastMessage(`Salon #${channelName} supprimé par ${this.currentUser.pseudo}.`);}
+      }
   }
 
   isDefaultChannel(channelId: string): boolean {
