@@ -18,13 +18,14 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     'general': [],
     'aide': [],
     'blabla': [],
-    'tech': []
+    'tech': [],
+    'channel_log': []
   };
   channelNames: Record<string, string> = {
     'general': 'général',
     'aide': 'aide & support',
     'blabla': 'blabla',
-    'tech': 'technologie'
+    'tech': 'technologie',
   };
   showChangePseudoPopup: boolean = false;
   showAddChannelPopup: boolean = false;
@@ -52,6 +53,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Subscribe to MQTT topics for all channels
     this.subscribeToChannels();
+    this.subscribeToLogChannel();
+
   }
 
   ngOnDestroy(): void {
@@ -111,6 +114,28 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  subscribeToLogChannel(): void {
+    const subscription = this.mqttService.observeTopic(`chat/channel_log`).subscribe((msg) => {
+      try {
+        const msgData = JSON.parse(msg.payload.toString()) as Message;
+        if(msgData.isSystem && msgData.SystemMessage) {
+            const systemMessage = msgData.SystemMessage;
+            if (systemMessage.type === 'channel_created') {
+                this.channelNames[systemMessage.channelName] = systemMessage.channelName;
+                this.channelMessages[systemMessage.channelName] = [];
+            } else if (systemMessage.type === 'channel_deleted') {
+                delete this.channelNames[systemMessage.channelName];
+                delete this.channelMessages[systemMessage.channelName];
+            }
+        }
+      } catch (err) {
+        console.error('Error parsing message:', err);
+      }
+    });
+
+    this.channelSubscriptions.push(subscription);
+  }
+
   sendMessage(): void {
     const content = this.messageInput.nativeElement.value.trim();
     if (content) {
@@ -156,6 +181,33 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 50);
   }
 
+  broadcastMessage(message: string): void {
+    const messageData: Message = {
+      author : "Système",
+      content: message,
+      time: new Date(),
+      isSystem: true,
+    }
+    setTimeout(() => this.scrollToBottom(), 50);
+    for (const channel in this.channelMessages) {
+      this.mqttService.publish(`chat/${channel}`, JSON.stringify(messageData));
+    }
+  }
+
+  annonceChannel(type : 'channel_created' | 'channel_deleted', channelName : string) {
+    const messageData: Message = {
+      author : "Système",
+      content: '',
+      time: new Date(),
+      isSystem: true,
+      SystemMessage: {
+        type,
+        channelName
+      }
+    }
+    this.mqttService.publish(`chat/channel_log`, JSON.stringify(messageData));
+  }
+
   confirmChangePseudo(): void {
     const newPseudo = this.newPseudo.trim();
     if (newPseudo && newPseudo !== this.currentUser.pseudo) {
@@ -166,7 +218,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       // Update user via service
       this.userService.updateUser({...this.currentUser});
 
-      this.addMessage('Système', `${oldPseudo} a changé son pseudo en ${newPseudo}.`, true);
+      this.broadcastMessage(`${oldPseudo} a changé son pseudo en ${newPseudo}.`);
       this.showChangePseudoPopup = false;
     } else {
       this.showChangePseudoPopup = false;
@@ -218,7 +270,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showAddChannelPopup = false;
 
       // Add system message about new channel
-      this.addMessage('Système', `Salon #${channelName} créé par ${this.currentUser.pseudo}.`, true);
+        this.broadcastMessage(`Salon #${channelName} créé par ${this.currentUser.pseudo}.`);
+        this.annonceChannel('channel_created', channelId);
     }
   }
 
@@ -244,7 +297,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
       if (isActive) {
         this.changeChannel('general');
-        this.addMessage('Système', `Le salon #${channelName} a été supprimé.`, true);
+        this.broadcastMessage(`Salon #${channelName} supprimé par ${this.currentUser.pseudo}.`);
+        this.annonceChannel('channel_deleted', channelId);
       }
     }
   }
