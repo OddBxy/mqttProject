@@ -23,13 +23,6 @@ export class UserService {
     this.userSubject.next(user);
   }
 
-  /**
-   * Get current user information
-   * @returns The current user
-   */
-  getCurrentUser(): User {
-    return this.userSubject.value;
-  }
 
   private loadUserFromStorage(): void {
     const savedUser = localStorage.getItem('chatUser');

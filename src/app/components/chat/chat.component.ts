@@ -318,44 +318,33 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     input.onchange = (event: Event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const base64Image = reader.result as string;
-          const messageData: Message = {
-            author: this.currentUser,
-            content: base64Image,
-            time: new Date(),
-            isSystem: false,
-          };
-
-          // Ajouter l'image au tableau local
-          this.channelMessages[this.currentChannel].push(messageData);
-
-          // Publier l'image via MQTT
-          this.mqttService.publish(`chat/${this.currentChannel}`, JSON.stringify(messageData));
-
-          // Faire défiler vers le bas
-          setTimeout(() => this.scrollToBottom(), 50);
-        };
-        reader.readAsDataURL(file);
+        this.fileReader(file)
       }
     };
     input.click();
   }
 
-  onAvatarChange(event: Event):void{
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64Image = reader.result as string;
-        this.currentUser.avatar = base64Image;
-
-        // Mettre à jour l'utilisateur via le service
-        this.userService.updateUser({...this.currentUser});
+  fileReader(file: File):void{
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Image = reader.result as string;
+      const messageData: Message = {
+        author: this.currentUser,
+        content: base64Image,
+        time: new Date(),
+        isSystem: false,
       };
-      reader.readAsDataURL(file);
-    }
+
+      // Ajouter l'image au tableau local
+      this.channelMessages[this.currentChannel].push(messageData);
+
+      // Publier l'image via MQTT
+      this.mqttService.publish(`chat/${this.currentChannel}`, JSON.stringify(messageData));
+
+      // Faire défiler vers le bas
+      setTimeout(() => this.scrollToBottom(), 50);
+    };
+    reader.readAsDataURL(file);
   }
 
   /**
@@ -459,27 +448,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       alert('La taille de l\'image ne doit pas dépasser 1MB.');
       return;
     }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64Image = reader.result as string;
-      const messageData: Message = {
-        author: this.currentUser,
-        content: base64Image,
-        time: new Date(),
-        isSystem: false,
-      };
-
-      // Ajouter l'image au tableau local
-      this.channelMessages[this.currentChannel].push(messageData);
-
-      // Publier l'image via MQTT
-      this.mqttService.publish(`chat/${this.currentChannel}`, JSON.stringify(messageData));
-
-      // Faire défiler vers le bas
-      setTimeout(() => this.scrollToBottom(), 50);
-    };
-    reader.readAsDataURL(file);
+    this.fileReader(file)
   }
 
 
