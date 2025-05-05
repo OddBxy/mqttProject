@@ -1,3 +1,4 @@
 export interface User {
-        pseudo: string;
+  pseudo: string;
+  avatar: string;
 }

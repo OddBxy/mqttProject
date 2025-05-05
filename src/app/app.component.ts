@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { MQTTCommunicationService } from './mqtt.service';
+import {Component, OnInit} from '@angular/core';
+import {MQTTCommunicationService} from './mqtt.service';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +11,8 @@ export class AppComponent implements OnInit {
   message = '';
   messages: string[] = [];
 
-  constructor(private mqttService: MQTTCommunicationService) {}
+  constructor(private mqttService: MQTTCommunicationService) {
+  }
 
   ngOnInit(): void {
     this.mqttService.observeTopic('test/topic').subscribe((msg) => {

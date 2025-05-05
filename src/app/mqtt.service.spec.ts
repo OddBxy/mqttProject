@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { MqttService } from './mqtt.service';
+import {MqttService} from './mqtt.service';
 
 describe('MqttService', () => {
   let service: MqttService;

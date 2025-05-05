@@ -1,0 +1,108 @@
+<div class="chat-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="user-info">
+      <div class="user-avatar">{{ getInitials(currentUser.pseudo) }}</div>
+      <div class="user-name">{{ currentUser.pseudo }}</div>
+      <button (click)="openChangePseudoPopup()" class="change-pseudo-btn">
+        <i class="fas fa-edit">✏️</i>
+      </button>
+    </div>
+    <div class="channels-header">
+      <span>SALONS</span>
+      <button (click)="openAddChannelPopup()" class="add-channel-btn">
+        <span class="plus-icon">+</span>
+      </button>
+    </div>
+    <ul class="channels-list">
+      <li *ngFor="let item of channelNames | keyvalue"
+          [class.active]="currentChannel === item.key"
+          [class.default-channel]="isDefaultChannel(item.key)">
+        <div (click)="changeChannel(item.key)" class="channel-container">
+          <div class="channel-info">
+            <span class="channel-icon">#</span>
+            <span class="channel-name">{{ item.value }}</span>
+          </div>
+          <span (click)="deleteChannel(item.key)" *ngIf="!isDefaultChannel(item.key)"
+                class="delete-channel">
+            <svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16">
+              <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+              <line x1="10" x2="10" y1="11" y2="17"></line>
+              <line x1="14" x2="14" y1="11" y2="17"></line>
+            </svg>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="chat-header">
+      <div class="current-channel-info">
+        <div class="current-channel-name">
+          <span class="channel-hash">#</span>
+          <span>{{ channelNames[currentChannel] }}</span>
+        </div>
+      </div>
+    </div>
+    <div #messagesContainer class="messages-container">
+      <div *ngFor="let msg of channelMessages[currentChannel]; let i = index; let isFirst = first"
+           [class.first-message]="isFirst || channelMessages[currentChannel][i-1].author !== msg.author"
+           class="message-wrapper">
+        <div [class.my-message]="msg.author === currentUser.pseudo"
+             [class.system-message]="msg.isSystem"
+             class="message">
+          <div *ngIf="isFirst || channelMessages[currentChannel][i-1]?.author !== msg.author" class="message-header">
+            <div *ngIf="!msg.isSystem" class="message-author-avatar">{{ getInitials(msg.author) }}</div>
+            <div class="message-author-info">
+              <div class="message-author">{{ msg.author }}</div>
+              <div class="message-time">
+                {{ msg.time | date:'HH:mm' }}
+              </div>
+            </div>
+          </div>
+          <div class="message-content">{{ msg.content }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="message-input-container">
+      <div class="message-input-wrapper">
+        <textarea #messageInput
+                  (keypress)="onKeyPress($event)"
+                  class="message-input"
+                  placeholder="Écrivez votre message..."></textarea>
+        <button (click)="sendMessage()" class="send-button">
+          <svg fill="none" height="18" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="18">
+            <line x1="22" x2="11" y1="2" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Change Pseudo Popup -->
+<div *ngIf="showChangePseudoPopup" class="popup-overlay">
+  <div class="popup">
+    <h3>Changer de pseudo</h3>
+    <input [(ngModel)]="newPseudo" placeholder="Nouveau pseudo" type="text">
+    <div class="popup-buttons">
+      <button (click)="showChangePseudoPopup = false" class="popup-button cancel-button">Annuler</button>
+      <button (click)="confirmChangePseudo()" class="popup-button confirm-button">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Channel Popup -->
+<div *ngIf="showAddChannelPopup" class="popup-overlay">
+  <div class="popup">
+    <h3>Ajouter un salon</h3>
+    <input [(ngModel)]="newChannelName" placeholder="Nom du salon" type="text">
+    <div class="popup-buttons">
+      <button (click)="showAddChannelPopup = false" class="popup-button cancel-button">Annuler</button>
+      <button (click)="addChannel()" class="popup-button confirm-button">Ajouter</button>
+    </div>
+  </div>
+</div>
