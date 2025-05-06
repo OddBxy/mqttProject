@@ -312,7 +312,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const sidebar = document.querySelector(".sidebar") as HTMLElement | null;
     const main = document.querySelector(".main-content") as HTMLElement | null;
-  
+
     if (sidebar && main) {
       if (window.innerWidth >= 768) {
         // En desktop : forcer visible
@@ -324,7 +324,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         main.style.display = "";
       }
     }
-  
+
   }
 
   select_sendImage(): void {
@@ -334,24 +334,22 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     input.onchange = (event: Event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (file) {
-        this.fileReader(file)
+        this.fileReader(file,800,800,0.8)
       }
     };
     input.click();
   }
 
-  fileReader(file: File):void{
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64Image = reader.result as string;
+  fileReader(file: File, maxWidth: number, maxHeight: number, quality: number): void {
+    this.compressImage(file, maxWidth, maxHeight, quality).then((compressedImage) => {
       const messageData: Message = {
         author: this.currentUser,
-        content: base64Image,
+        content: compressedImage,
         time: new Date(),
         isSystem: false,
       };
 
-      // Ajouter l'image au tableau local
+      // Ajouter l'image compressée au tableau local
       this.channelMessages[this.currentChannel].push(messageData);
 
       // Publier l'image via MQTT
@@ -359,8 +357,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
       // Faire défiler vers le bas
       setTimeout(() => this.scrollToBottom(), 50);
-    };
-    reader.readAsDataURL(file);
+    }).catch((error) => {
+      console.error('Erreur lors de la compression de l\'image :', error);
+    });
   }
 
   /**
@@ -421,8 +420,12 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     input.onchange = (event: Event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (file) {
-        this.onAvatarDrop(file)
-      }
+        this.compressImage(file, 256, 256, 0.8).then((compressedImage) => {
+          this.currentUser.photoURL = compressedImage;
+          this.userService.updateUser({ ...this.currentUser });
+        }).catch((error) => {
+          console.error('Erreur lors de la compression de l\'image :', error);
+        });}
     };
 
     input.click();
@@ -447,26 +450,57 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   onAvatarDrop(file: File): void {
-    if (file.size > 1024 * 1024) {
-      alert('La taille de l\'image ne doit pas dépasser 1MB.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.currentUser.photoURL = reader.result as string;
+    this.compressImage(file, 256, 256, 0.8).then((compressedImage) => {
+      this.currentUser.photoURL = compressedImage;
       this.userService.updateUser({ ...this.currentUser });
-    };
-    reader.readAsDataURL(file);
+    }).catch((error) => {
+      console.error('Erreur lors de la compression de l\'image :', error);
+    });
   }
 
   onImageDrop(file: File): void {
-    if (file.size > 10 * 1024 * 1024) {
-      alert('La taille de l\'image ne doit pas dépasser 10MB.');
-      return;
-    }
-    this.fileReader(file)
+    this.fileReader(file,800,800,0.8)
   }
 
+  compressImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Redimensionner si nécessaire
+          if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality); // Compression en JPEG
+            resolve(compressedDataUrl);
+          } else {
+            reject('Impossible de créer le contexte du canvas.');
+          }
+        };
+        img.onerror = () => reject('Erreur lors du chargement de l\'image.');
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = () => reject('Erreur lors de la lecture du fichier.');
+      reader.readAsDataURL(file);
+    });
+  }
 
 }
