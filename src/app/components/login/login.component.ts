@@ -3,6 +3,7 @@ import {User} from "../../interfaces/user";
 import {Router} from "@angular/router";
 import {UserService} from '../../user.service';
 import {DomSanitizer, SafeStyle} from '@angular/platform-browser';
+import {ImageCompressionServiceService} from '../../image-compression-service.service';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +17,8 @@ export class LoginComponent {
   constructor(
     private router: Router,
     private userService: UserService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private imageCompressionService: ImageCompressionServiceService,
   ) {
   }
 
@@ -50,7 +52,7 @@ export class LoginComponent {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (file) {
 
-        this.compressImage(file, 256, 256, 0.8).then((compressedImage) => {
+        this.imageCompressionService.compressImage(file, 256, 256, 0.8).then((compressedImage) => {
           this.currentUser.photoURL = compressedImage;
         }).catch((error) => {
           console.error('Erreur lors de la compression de l\'image :', error);
@@ -81,50 +83,10 @@ export class LoginComponent {
 
   selectProfilePhotoFromDrop(file: File): void {
 
-    this.compressImage(file, 256, 256, 0.8).then((compressedImage) => {
+    this.imageCompressionService.compressImage(file, 256, 256, 0.8).then((compressedImage) => {
       this.currentUser.photoURL = compressedImage;
     }).catch((error) => {
       console.error('Erreur lors de la compression de l\'image :', error);
-    });
-  }
-
-  compressImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-
-          if (width > maxWidth || height > maxHeight) {
-            if (width > height) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            } else {
-              width = Math.round((width * maxHeight) / height);
-              height = maxHeight;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.drawImage(img, 0, 0, width, height);
-            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-            resolve(compressedDataUrl);
-          } else {
-            reject('Impossible de créer le contexte du canvas.');
-          }
-        };
-        img.onerror = () => reject('Erreur lors du chargement de l\'image.');
-        img.src = event.target?.result as string;
-      };
-      reader.onerror = () => reject('Erreur lors de la lecture du fichier.');
-      reader.readAsDataURL(file);
     });
   }
 }

@@ -5,6 +5,7 @@ import {MQTTCommunicationService} from '../../mqtt.service';
 import {UserService} from '../../user.service';
 import {Subscription} from 'rxjs';
 import {DomSanitizer, SafeStyle} from '@angular/platform-browser';
+import { ImageCompressionServiceService} from '../../image-compression-service.service';
 
 
 @Component({
@@ -41,7 +42,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private mqttService: MQTTCommunicationService,
     private userService: UserService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private imageCompressionService: ImageCompressionServiceService,
   ) {}
 
   ngOnInit(): void {
@@ -341,7 +343,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   fileReader(file: File, maxWidth: number, maxHeight: number, quality: number): void {
-    this.compressImage(file, maxWidth, maxHeight, quality).then((compressedImage) => {
+    this.imageCompressionService.compressImage(file, maxWidth, maxHeight, quality).then((compressedImage) => {
       const messageData: Message = {
         author: this.currentUser,
         content: compressedImage,
@@ -420,7 +422,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     input.onchange = (event: Event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (file) {
-        this.compressImage(file, 256, 256, 0.8).then((compressedImage) => {
+        this.imageCompressionService.compressImage(file, 256, 256, 0.8).then((compressedImage) => {
           this.currentUser.photoURL = compressedImage;
           this.userService.updateUser({ ...this.currentUser });
         }).catch((error) => {
@@ -450,7 +452,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   onAvatarDrop(file: File): void {
-    this.compressImage(file, 256, 256, 0.8).then((compressedImage) => {
+    this.imageCompressionService.compressImage(file, 256, 256, 0.8).then((compressedImage) => {
       this.currentUser.photoURL = compressedImage;
       this.userService.updateUser({ ...this.currentUser });
     }).catch((error) => {
@@ -460,47 +462,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onImageDrop(file: File): void {
     this.fileReader(file,800,800,0.8)
-  }
-
-  compressImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-
-          // Redimensionner si nécessaire
-          if (width > maxWidth || height > maxHeight) {
-            if (width > height) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            } else {
-              width = Math.round((width * maxHeight) / height);
-              height = maxHeight;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.drawImage(img, 0, 0, width, height);
-            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality); // Compression en JPEG
-            resolve(compressedDataUrl);
-          } else {
-            reject('Impossible de créer le contexte du canvas.');
-          }
-        };
-        img.onerror = () => reject('Erreur lors du chargement de l\'image.');
-        img.src = event.target?.result as string;
-      };
-      reader.onerror = () => reject('Erreur lors de la lecture du fichier.');
-      reader.readAsDataURL(file);
-    });
   }
 
 }
